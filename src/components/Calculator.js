@@ -1,7 +1,15 @@
 import React, { useState } from "react";
+import SimpleEChart from "./SimpleEChart";
 
 function Calculator() {
-    const [cal,setCal] = useState({wealthCrores:50000000,currentAge:25,targetAge:75,inflationRate:5,returnRate:12.5,currentSavings:500000})
+    const [cal, setCal] = useState({
+        wealthCrores: 50000000,
+        currentAge: 25,
+        targetAge: 75,
+        inflationRate: 5,
+        returnRate: 12.5,
+        currentSavings: 500000
+    });
     const [result, setResult] = useState(null);
     const [savingResult, setSavingResult] = useState(null);
     const [target, setTarget] = useState(null);
@@ -14,52 +22,57 @@ function Calculator() {
         setCal({ ...cal, [e.target.name]: Number(e.target.value) }); // Convert values to numbers
     };
 
-    
     const handleCalculate = () => {
-        const yearsToTarget = cal.targetAge-cal.currentAge;
+        const yearsToTarget = cal.targetAge - cal.currentAge;
         if (yearsToTarget <= 0) {
             alert('Target age must be greater than current age.');
             return;
         }
         setTarget(yearsToTarget);
 
-        let infla = 1+(cal.inflationRate/100);
-        const FV = cal.wealthCrores*Math.pow(infla,yearsToTarget);
+        let infla = 1 + (cal.inflationRate / 100);
+        const FV = cal.wealthCrores * Math.pow(infla, yearsToTarget);
         setResult(FV.toFixed());
-        
+
         const annualReturnRate = cal.returnRate / 100;
         const futureSavings = cal.currentSavings * Math.pow(1 + annualReturnRate, yearsToTarget);
         setSavingResult(futureSavings);
 
-        setAfterSavingWealth(FV.toFixed()-futureSavings.toFixed());
+        const afterSavingWealth = FV - futureSavings;
+        setAfterSavingWealth(afterSavingWealth.toFixed());
 
-        const totalMonths = yearsToTarget*12;
-        const monthlyRate = (cal.returnRate/12)/100;
-        
-        const SIPAmount = ((FV-futureSavings) * monthlyRate) / (Math.pow(1 + monthlyRate, totalMonths) - 1);
-        setSip(SIPAmount);
+        const totalMonths = yearsToTarget * 12;
+        const monthlyRate = (cal.returnRate / 12) / 100;
+        const SIPAmount = ((FV - futureSavings) * monthlyRate) / (Math.pow(1 + monthlyRate, totalMonths) - 1);
+        setSip(SIPAmount.toFixed());
 
-        setTotalSip(SIPAmount.toFixed()*totalMonths.toFixed());
+        const totalSip = SIPAmount * totalMonths;
+        setTotalSip(totalSip.toFixed());
 
-        setGrowthAmount((FV.toFixed()-futureSavings.toFixed())-(SIPAmount.toFixed()*totalMonths.toFixed()));
+        const growthAmount = (FV - futureSavings) - totalSip;
+        setGrowthAmount(growthAmount.toFixed());
     };
-    // (FV)=P×(1+r)^t
-    // FV (inflation-adjusted)=PV×(1+i)^n
-    // A = P * (1+r/100)^n
 
     const formatNumber = (num) => {
         return new Intl.NumberFormat('en-IN').format(num);
-        
     };
-    
+
+    const sampleData = [
+        { value: result ? parseFloat(result) : 0, name: 'Targeted Wealth Amount (Inflation adjusted)' },
+        { value: savingResult ? parseFloat(savingResult.toFixed()) : 0, name: 'Growth of Savings Amount' },
+        { value: afterSavingWealth ? parseFloat(afterSavingWealth) : 0, name: 'Final Targeted Amount (Minus Savings)' },
+        { value: sip ? parseFloat(sip) : 0, name: 'Monthly SIP Investment Required' },
+        { value: totalSip ? parseFloat(totalSip) : 0, name: 'Total Amount Invested Through SIP' },
+        { value: growthAmount ? parseFloat(growthAmount) : 0, name: 'Total Growth Amount' },
+    ];
 
     return (
         <>
             <div className="form-group">
                 <h1 className="text-center m-4">Carorepati Calculator</h1><hr/>
                 <div className="row">
-                <div className="col-md-5 ms-3">
-                <h3 className="text-center my-3">Select Range</h3>
+                    <div className="col-md-5 ms-3">
+                        <h3 className="text-center my-3">Select Range</h3>
 
                 <div className="row">
                     <div className="col-md-12">
@@ -115,34 +128,27 @@ function Calculator() {
                         </div>
                     </div>
                 </div>
-                    <button className="btn btn-primary" onClick={handleCalculate}>Calculate</button>
+                <button className="btn btn-primary" onClick={handleCalculate}>Calculate</button>
+                    </div>
+                    <div className="col-md-6 ms-5">
+                        <h3 className="text-center my-3">Result</h3>
+                        <SimpleEChart name="Investment Growth" data={sampleData} />
+                        {result !== null && (
+                            <div className="result mt-5">
+                                <h6>* Your targeted Wealth Amount (Inflation adjusted) :- <b><i className="fa fa-rupee"></i>{formatNumber(result)}</b></h6><br/>
+                                <h6>* Growth of your Savings Amount ({cal.returnRate}% per annum) :- <b><i className="fa fa-rupee"></i>{formatNumber(savingResult.toFixed())}</b></h6><br/>
+                                <h6>* Final Targeted Amount ( Minus growth of your savings amount) :- <b><i className="fa fa-rupee"></i>{formatNumber(afterSavingWealth)}</b></h6><br/> 
+                                <h6>* Number of years you need to save :- <b>{target} Years</b></h6><br/>
+                                <h6>* Monthly SIP investment required (to become Crorepati) :-<b><i className="fa fa-rupee"></i>{formatNumber(sip)}</b></h6><br/> 
+                                <h6>* Total Amount Invested through SIP in {target} years :- <b><i className="fa fa-rupee"></i>{formatNumber(totalSip)}</b></h6><br/> 
+                                <h6>* Total Growth Amount :- <b><i className="fa fa-rupee"></i>{formatNumber(growthAmount)}</b></h6><br/> 
+                            </div>
+                        )}
+                    </div>
                 </div>
-                <div className="col-md-6 ms-5">
-                <h3 className="text-center my-3">Result</h3>
-                {result !== null && (
-                        <div className="result">
-                            <h6>* Your targeted Wealth Amount (Inflation adjusted) :- <b><i class="fa fa-rupee"></i>{formatNumber(result)}</b></h6><br/>
-
-                            <h6>* Growth of your Savings Amount ({cal.returnRate}% per annum) :- <b><i class="fa fa-rupee"></i>{formatNumber(savingResult.toFixed())}</b></h6><br/>
-
-                            <h6>* Final Targeted Amount ( Minus growth of your savings amount) :- <b><i class="fa fa-rupee"></i>{formatNumber(afterSavingWealth)}</b></h6><br/> 
-
-                            <h6>* Number of years you need to save :- <b>{target} Years</b></h6><br/>
-
-                            <h6>* Monthly SIP investment required (to become Crorepati) :-<b><i class="fa fa-rupee"></i>{formatNumber(sip.toFixed())}</b></h6><br/> 
-
-                            <h6>* Total Amount Invested through SIP in {target} years :- <b><i class="fa fa-rupee"></i>{formatNumber(totalSip)}</b></h6><br/> 
-                            
-                            <h6>* Total Growth Amount :- <b><i class="fa fa-rupee"></i>{formatNumber(growthAmount)}</b></h6><br/> 
-                        </div>
-                    )}
-                </div>
-                </div>
-                
-
             </div>
-                
         </>
     );
 }
+
 export default Calculator;

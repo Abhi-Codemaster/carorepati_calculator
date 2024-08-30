@@ -1,8 +1,7 @@
 import React from 'react';
 import ReactECharts from 'echarts-for-react';
 
-const SimpleEChart = (props) => {
-  console.log(props);
+const SimpleEChart = ({ name = 'Default', data = [] }) => {
   const option = {
     title: {
       text: 'Carorepati ECharts',
@@ -14,9 +13,9 @@ const SimpleEChart = (props) => {
     yAxis: {},
     series: [
       {
-        name: props.name,
+        name: name,
         type: 'pie',
-        data: props.data,
+        data: data,
       },
     ],
   };
