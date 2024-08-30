@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import SimpleEChart from "./SimpleEChart";
 
 function Calculator() {
     const [cal,setCal] = useState({wealthCrores:50000000,currentAge:25,targetAge:75,inflationRate:5,returnRate:12.5,currentSavings:500000})
@@ -120,7 +119,6 @@ function Calculator() {
                 </div>
                 <div className="col-md-6 ms-5">
                 <h3 className="text-center my-3">Result</h3>
-                <SimpleEChart name={"value"} data={data}/>
                 {result !== null && (
                         <div className="result">
                             <h6>* Your targeted Wealth Amount (Inflation adjusted) :- <b><i class="fa fa-rupee"></i>{formatNumber(result)}</b></h6><br/>

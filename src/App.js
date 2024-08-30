@@ -1,11 +1,11 @@
 import './App.css';
 import Calculator from './components/Calculator';
-// import Header from './components/Header';
+import Header from './components/Header';
 
 function App() {
   return (
     <>
-      {/* <Header/> */}
+      <Header/>
     <div className="container">
       <Calculator/>
     </div>
